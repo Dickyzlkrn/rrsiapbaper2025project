@@ -1,0 +1,191 @@
+@extends('layouts.app')
+
+@section('title', 'Tambah Pengajuan Barang')
+
+@section('content')
+<div class="form-container">
+    <div class="page-header">
+        <h3>Form Pengajuan Barang</h3>
+        <a href="{{ route('user.pengajuan') }}" class="btn-back">
+            <i class='bx bx-arrow-back'></i>
+            <span>Kembali</span>
+        </a>
+    </div>
+
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <i class='bx bxs-error-circle'></i>
+            <ul class="m-0 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('user.pengajuan.store') }}" method="POST" class="form-input">
+        @csrf
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="nama_pengaju">Nama Pengaju <span class="text-danger">*</span></label>
+                <input type="text" id="nama_pengaju" name="nama_pengaju" class="form-control" value="{{ old('nama_pengaju') }}" required>
+            </div>
+            <div class="form-group">
+                <label for="ruangan">Ruangan <span class="text-danger">*</span></label>
+                <input type="text" id="ruangan" name="ruangan" class="form-control" value="{{ old('ruangan') }}" required>
+            </div>
+        </div>
+
+        <hr>
+        <h5>Detail Barang</h5>
+        <div id="items-container">
+            <div class="form-grid item-row mb-2" style="display: flex; gap: 10px; align-items: center;">
+                <div class="form-group" style="flex: 1;">
+                    <input type="text" name="items[0][nama_barang]" class="form-control autocomplete-barang" placeholder="Nama Barang" required>
+                </div>
+                <div class="form-group" style="flex: 0.5;">
+                    <input type="number" name="items[0][jumlah]" class="form-control jumlah-barang" placeholder="Jumlah" min="1" required>
+                </div>
+                <div class="form-group" style="flex: 0.5;">
+                    <input type="text" class="form-control bg-light satuan-display" value="Satuan: -" readonly>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;" onclick="removeItemRow(this)">
+                        <i class="bx bx-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <button type="button" class="btn-submit" style="background-color: #6c757d; color: white;" onclick="addItemRow()">
+                <i class='bx bx-plus'></i> <span>Tambah Barang</span>
+            </button>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-submit" id="submit-btn" disabled>
+                <i class='bx bx-send'></i>
+                <span>Kirim Pengajuan</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+{{-- JS & jQuery UI --}}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<style>
+    .satuan-display[value="Satuan: -"] {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    let itemIndex = 1;
+
+    function addItemRow() {
+        const container = document.getElementById('items-container');
+        const html = `
+        <div class="form-grid item-row mb-2" style="display: flex; gap: 10px; align-items: center;">
+            <div class="form-group" style="flex: 1;">
+                <input type="text" name="items[${itemIndex}][nama_barang]" class="form-control autocomplete-barang" placeholder="Nama Barang" required>
+            </div>
+            <div class="form-group" style="flex: 0.5;">
+                <input type="number" name="items[${itemIndex}][jumlah]" class="form-control jumlah-barang" placeholder="Jumlah" min="1" required>
+            </div>
+            <div class="form-group" style="flex: 0.5;">
+                <input type="text" class="form-control bg-light satuan-display" value="Satuan: -" readonly>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;" onclick="removeItemRow(this)">
+                    <i class="bx bx-trash"></i>
+                </button>
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', html);
+        itemIndex++;
+        enableAutocomplete();
+    }
+
+    function removeItemRow(button) {
+        const row = button.closest('.item-row');
+        if (row) row.remove();
+        toggleSubmitButton();
+    }
+
+    function enableAutocomplete() {
+        const inputs = document.querySelectorAll('.autocomplete-barang');
+
+        inputs.forEach((input) => {
+            if (!input.dataset.bound) {
+                $(input).autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: '{{ route("stok.autocomplete") }}',
+                            data: { term: request.term },
+                            success: function (data) {
+                                response(data);
+                                const row = input.closest('.item-row');
+                                const satuanDisplay = row.querySelector('.satuan-display');
+
+                                if (data.length === 0) {
+                                    satuanDisplay.value = 'Satuan: -';
+                                    input.dataset.valid = "false";
+                                } else {
+                                    satuanDisplay.value = 'Satuan: -';
+                                    input.dataset.valid = "true";
+                                }
+
+                                toggleSubmitButton();
+                            }
+                        });
+                    },
+                    minLength: 1,
+                    select: function (event, ui) {
+                        const row = input.closest('.item-row');
+                        const satuanDisplay = row.querySelector('.satuan-display');
+                        const jumlahInput = row.querySelector('.jumlah-barang');
+
+                        satuanDisplay.value = 'Satuan: ' + (ui.item.satuan ?? '-');
+                        jumlahInput.removeAttribute('max');
+
+                        input.dataset.valid = "true";
+                        toggleSubmitButton();
+                    }
+                });
+
+                input.addEventListener('input', function () {
+                    this.dataset.valid = "false";
+                    const row = this.closest('.item-row');
+                    const satuanDisplay = row.querySelector('.satuan-display');
+                    satuanDisplay.value = 'Satuan: -';
+                    toggleSubmitButton();
+                });
+
+                input.dataset.bound = true;
+            }
+        });
+    }
+
+    function toggleSubmitButton() {
+        const allInputs = document.querySelectorAll('.autocomplete-barang');
+        const btnSubmit = document.getElementById('submit-btn');
+
+        let allValid = true;
+        allInputs.forEach(input => {
+            if (input.dataset.valid !== "true") {
+                allValid = false;
+            }
+        });
+
+        btnSubmit.disabled = !allValid;
+    }
+
+    document.addEventListener('DOMContentLoaded', enableAutocomplete);
+</script>
+@endsection

@@ -1,0 +1,1568 @@
+/* public/assets/css/style.css */
+
+/* --- Google Fonts & Reset --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #3b82f6;
+    /* blue-500 */
+    --primary-hover-color: #2563eb;
+    /* blue-600 */
+    --sidebar-bg: #ffffff;
+    --sidebar-link-color: #4b5563;
+    /* gray-600 */
+    --sidebar-link-hover-bg: #f3f4f6;
+    /* gray-100 */
+    --sidebar-link-active-color: #ffffff;
+    --content-bg: #f9fafb;
+    /* gray-50 */
+    --text-color-dark: #1f2937;
+    /* gray-800 */
+    --border-color: #e5e7eb;
+    /* gray-200 */
+}
+
+.status-diajukan {
+    background-color: #ffc107;
+}
+
+.status-disetujui {
+    background-color: #28a745;
+}
+
+.status-ditolak {
+    background-color: #dc3545;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--content-bg);
+    color: var(--text-color-dark);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style-type: none;
+}
+
+/* --- Main Layout --- */
+.main-wrapper {
+    display: flex;
+    min-height: 100vh;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    /* Mencegah sidebar menyusut */
+    transition: width 0.3s ease-in-out;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header .logo-icon {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 1rem 0;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background-color: #e2e6ea;
+    border-color: #ced4da;
+}
+
+.btn-edit {
+    background-color: #fff3cd;
+}
+
+.btn-edit i {
+    color: #856404;
+}
+
+.btn-delete {
+    background-color: #f8d7da;
+}
+
+.btn-delete i {
+    color: #721c24;
+}
+
+
+.sidebar-nav ul li a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.5rem;
+    color: var(--sidebar-link-color);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+    /* Mencegah teks turun baris */
+}
+
+.sidebar-nav ul li a .icon {
+    font-size: 1.2rem;
+    min-width: 20px;
+    /* Jaga alignment ikon */
+    text-align: center;
+}
+
+.sidebar-nav ul li a:hover {
+    background-color: var(--sidebar-link-hover-bg);
+    color: var(--text-color-dark);
+}
+
+.sidebar-nav ul li.active>a {
+    /* Menggunakan RGBA untuk membuat warna biru transparan */
+    background-color: rgba(80, 74, 255, 0.144);
+    /* Biru dengan 15% opacity */
+
+    /* Mengubah warna teks dan ikon menjadi biru solid agar terlihat jelas */
+    color: var(--primary-color);
+    font-weight: 600;
+    /* Membuat teks sedikit lebih tebal */
+
+    border-radius: 6px;
+    margin: 0.2rem 1rem;
+    padding: 0.9rem 1rem;
+}
+
+/* --- Sidebar Collapsed State --- */
+.sidebar.collapsed {
+    width: 88px;
+}
+
+.sidebar.collapsed .sidebar-header .logo-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-nav ul li a .link-text {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-nav ul li.active>a {
+    margin: 0.2rem 0.5rem;
+}
+
+.sidebar.collapsed .sidebar-nav ul li a {
+    justify-content: center;
+}
+
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* --- Login Page Styles --- */
+.login-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--content-bg);
+}
+
+/* Styling khusus dropdown pengambilan */
+select.select-pengambilan {
+    appearance: none;
+    /* Hilangkan style bawaan browser */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #fff;
+    border: 1.5px solid #ced4da;
+    border-radius: 6px;
+    padding: 8px 38px 8px 12px;
+    font-size: 14px;
+    color: #212529;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    min-width: 130px;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23707070' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658c-.566-.64.345-1.658.808-1.207l4.792 5.48 4.792-5.48c.463-.451 1.374.567.808 1.207l-4.796 5.482a1 1 0 0 1-1.31 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px 16px;
+}
+
+select.select-pengambilan:hover {
+    border-color: #0d6efd;
+}
+
+select.select-pengambilan:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 6px rgba(13, 110, 253, 0.5);
+}
+
+
+.login-container {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    min-height: 550px;
+    background-color: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.login-branding {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary-color), #60a5fa);
+    color: #fff;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.login-logo {
+    max-width: 180px;
+    margin-bottom: 1rem;
+}
+
+.login-branding h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.login-form {
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-form h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-color-dark);
+}
+
+.login-form .subtitle {
+    color: #6b7280;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+.input-wrapper input {
+    width: 100%;
+    height: 50px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0 1rem 0 3rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.forgot-password {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 0.9rem;
+    border: none;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-login:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.error-message {
+    color: #ef4444;
+    /* red-500 */
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        max-width: 400px;
+        min-height: auto;
+    }
+
+    .login-branding {
+        padding: 2rem 1rem;
+    }
+
+    .login-logo {
+        max-width: 120px;
+    }
+
+    .login-form {
+        padding: 2rem;
+    }
+}
+
+/* --- Form Styles --- */
+.form-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.form-header p {
+    color: #6b7280;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Dua kolom */
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    height: 45px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0 1rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+.form-text {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-top: 0.5rem;
+}
+
+.form-actions {
+    margin-top: 2rem;
+    text-align: right;
+}
+
+.btn-submit {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    background-color: var(--primary-color);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-submit:hover {
+    background-color: var(--primary-hover-color);
+}
+
+/* Override gaya Select2 agar sesuai tema */
+.select2-container--default .select2-selection--multiple {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.3rem;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+/* Responsif untuk form */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        /* Satu kolom di mobile */
+    }
+}
+
+/* --- Data Table & Index Page Styles --- */
+
+.data-container {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.page-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-add-new {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-add-new:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.btn-add-new i {
+    font-size: 1.2rem;
+}
+
+/* Alert Notifikasi */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.alert.alert-success {
+    background-color: #dcfce7;
+    /* green-100 */
+    color: #166534;
+    /* green-800 */
+}
+
+.alert i {
+    font-size: 1.5rem;
+}
+
+/* Table Styles */
+.table-wrapper {
+    overflow-x: auto;
+    /* Membuat tabel bisa di-scroll horizontal di mobile */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+    /* Mencegah teks turun baris */
+}
+
+.data-table th,
+.data-table td {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table thead {
+    background-color: #f9fafb;
+    /* gray-50 */
+}
+
+.data-table th {
+    font-weight: 600;
+    color: #4b5563;
+    /* gray-600 */
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.data-table .text-center {
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+}
+
+/* Status Badge Styles */
+.status-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.status-diajukan {
+    background-color: #fef3c7;
+    /* yellow-200 */
+    color: #92400e;
+    /* yellow-800 */
+}
+
+.status-badge.status-disetujui {
+    background-color: #dcfce7;
+    /* green-200 */
+    color: #166534;
+    /* green-800 */
+}
+
+.status-badge.status-direvisi {
+    background-color: #cffafe;
+    /* cyan-200 */
+    color: #155e75;
+    /* cyan-800 */
+}
+
+.status-badge.status-ditolak {
+    background-color: #fee2e2;
+    /* red-200 */
+    color: #991b1b;
+    /* red-800 */
+}
+
+/* Action Button Styles */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    font-size: 1.1rem;
+}
+
+.btn-action.btn-view {
+    background-color: #e0e7ff;
+    /* indigo-100 */
+    color: #4338ca;
+    /* indigo-700 */
+}
+
+.btn-action.btn-edit {
+    background-color: #fef9c3;
+    /* yellow-100 */
+    color: #854d0e;
+    /* yellow-700 */
+}
+
+/* --- Data Table & Index Page Styles --- */
+
+.data-container {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.page-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-add-new {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-add-new:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.btn-add-new i {
+    font-size: 1.2rem;
+}
+
+/* Alert Notifikasi */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.alert.alert-success {
+    background-color: #dcfce7;
+    /* green-100 */
+    color: #166534;
+    /* green-800 */
+}
+
+.alert i {
+    font-size: 1.5rem;
+}
+
+/* Table Styles */
+.table-wrapper {
+    overflow-x: auto;
+    /* Membuat tabel bisa di-scroll horizontal di mobile */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+    /* Mencegah teks turun baris */
+}
+
+.data-table th,
+.data-table td {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table thead {
+    background-color: #f9fafb;
+    /* gray-50 */
+}
+
+.data-table th {
+    font-weight: 600;
+    color: #4b5563;
+    /* gray-600 */
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.data-table .text-center {
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+}
+
+/* Status Badge Styles */
+.status-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.status-diajukan {
+    background-color: #fef3c7;
+    /* yellow-200 */
+    color: #92400e;
+    /* yellow-800 */
+}
+
+.status-badge.status-disetujui {
+    background-color: #dcfce7;
+    /* green-200 */
+    color: #166534;
+    /* green-800 */
+}
+
+.status-badge.status-direvisi {
+    background-color: #cffafe;
+    /* cyan-200 */
+    color: #155e75;
+    /* cyan-800 */
+}
+
+.status-badge.status-ditolak {
+    background-color: #fee2e2;
+    /* red-200 */
+    color: #991b1b;
+    /* red-800 */
+}
+
+/* Action Button Styles */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    font-size: 1.1rem;
+}
+
+.btn-action.btn-view {
+    background-color: #e0e7ff;
+    /* indigo-100 */
+    color: #4338ca;
+    /* indigo-700 */
+}
+
+.btn-action.btn-edit {
+    background-color: #fef9c3;
+    /* yellow-100 */
+    color: #854d0e;
+    /* yellow-700 */
+}
+
+.btn-action.btn-delete {
+    background-color: #fee2e2;
+    /* red-100 */
+    color: #b91c1c;
+    /* red-700 */
+}
+
+.btn-action:hover {
+    filter: brightness(0.95);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    animation: fadeIn 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.close-modal {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Penyesuaian untuk Form Layout Grid */
+
+.form-grid {
+    display: grid;
+    /* Membuat layout 2 kolom dengan lebar yang sama */
+    grid-template-columns: 1fr 1fr;
+    /* Memberi jarak antar kolom dan baris */
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.textarea-control {
+    height: auto;
+    /* Agar tinggi textarea mengikuti atribut 'rows' */
+    min-height: 100px;
+    padding-top: 0.75rem;
+}
+
+/* Penyesuaian untuk Tombol Kirim */
+.form-actions {
+    text-align: right;
+    margin-top: 1.5rem;
+}
+
+/* --- Filter Form, Header, & Pagination Styles --- */
+
+/* Menyesuaikan Header Halaman (Judul & Tombol Ekspor) */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.btn-export {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background-color: #f3f4f6;
+    /* gray-100 */
+    color: #374151;
+    /* gray-700 */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-export:hover {
+    background-color: #e5e7eb;
+    /* gray-200 */
+    border-color: #d1d5db;
+    /* gray-300 */
+}
+
+.btn-export i {
+    font-size: 1.2rem;
+}
+
+/* Filter Form Layout */
+.filter-form {
+    background-color: #f9fafb;
+    /* gray-50 */
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    /* Agar responsif */
+    align-items: flex-end;
+    /* Menjajarkan bagian bawah elemen */
+    gap: 1rem;
+    /* Jarak antar elemen filter */
+}
+
+.form-filter-group>div {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-filter-group label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #4b5563;
+    /* gray-600 */
+    margin-bottom: 0.3rem;
+}
+
+/* Membuat ukuran input & select lebih kecil/kompak */
+.form-filter-group .form-control {
+    height: 38px;
+    width: 160px;
+    /* Atur lebar agar tidak terlalu besar */
+    font-size: 0.9rem;
+    padding: 0 0.75rem;
+}
+
+/* Tombol Aksi di Welcome Card */
+.btn-welcome-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.7rem 1.2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: var(--primary-color);
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-welcome-action:hover {
+    background-color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-welcome-action i {
+    font-size: 1.2rem;
+}
+
+/* --- Dashboard Quick Stats --- */
+.quick-stats-grid {
+    display: grid;
+    /* Membuat grid responsif, akan menjadi 2 kolom atau 1 kolom di layar kecil */
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
+}
+
+.stat-card-icon {
+    width: 54px;
+    height: 54px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.8rem;
+}
+
+/* Variasi Warna Ikon */
+.stat-card-icon.icon-blue {
+    background-color: #e0f2fe;
+    /* sky-100 */
+    color: #0369a1;
+    /* sky-700 */
+}
+
+.stat-card-icon.icon-green {
+    background-color: #dcfce7;
+    /* green-100 */
+    color: #166534;
+    /* green-800 */
+}
+
+.stat-card-icon.icon-yellow {
+    background-color: #fef9c3;
+    /* yellow-100 */
+    color: #854d0e;
+    /* yellow-700 */
+}
+
+.stat-card-icon.icon-red {
+    background-color: #fee2e2;
+    /* red-100 */
+    color: #b91c1c;
+    /* red-700 */
+}
+
+.stat-card-info p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+    gap: 5px;
+    /* jarak antar tombol */
+}
+
+.pagination li.page-item {
+    display: inline;
+}
+
+.pagination li.page-item a.page-link,
+.pagination li.page-item span.page-link {
+    display: inline-block;
+    padding: 6px 12px;
+    color: #007bff;
+    text-decoration: none;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination li.page-item.active span.page-link {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+    cursor: default;
+}
+
+.pagination li.page-item.disabled span.page-link {
+    color: #6c757d;
+    cursor: not-allowed;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+.btn-export,
+.btn-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    border: none;
+}
+
+/* Tombol Rekap Excel (misal warna abu gelap) */
+.btn-export {
+    background-color: #c3c3c3;
+    color: #fff;
+}
+
+.btn-export:hover {
+    background-color: #949494;
+}
+
+/* Tombol Filter dengan warna biru */
+.btn-filter {
+    background-color: #0d6efd;
+    /* Bootstrap primary blue */
+    color: #fff;
+}
+
+.btn-filter:hover {
+    background-color: #0b5ed7;
+    /* Hover lebih gelap */
+}
+
+/* Icon dalam tombol */
+.btn-export i,
+.btn-filter i {
+    font-size: 18px;
+}
+
+.stat-card-info h3 {
+    font-size: 2.25rem;
+    color: var(--text-color-dark);
+    font-weight: 600;
+    margin: 0;
+}
+
+.form-filter-group #tanggal {
+    width: 180px;
+    /* Sedikit lebih lebar untuk tanggal */
+}
+
+.btn- .btn-submit {
+    display: inline-flex;
+    /* Mengubah dari block menjadi inline-flex */
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Membuat form kembali menjadi 1 kolom di layar kecil (Mobile) */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Navbar --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: #fff;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-left .menu-toggle {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-color-dark);
+}
+
+.navbar-right {
+    font-weight: 500;
+    color: var(--text-color-dark);
+}
+
+/* --- Page Content & Footer --- */
+.page-content {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.footer {
+    padding: 1rem 1.5rem;
+    background-color: #fff;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 1000;
+        width: 260px !important;
+        /* Paksa lebar normal di mobile */
+    }
+
+    /* Hilangkan state collapsed di mobile, ganti dengan show/hide */
+    .sidebar.collapsed {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .menu-toggle.desktop {
+        display: none;
+        /* Sembunyikan toggle desktop */
+    }
+}
+
+@media (min-width: 769px) {
+    .menu-toggle.mobile {
+        display: none;
+        /* Sembunyikan toggle mobile */
+    }
+}
+
+/* --- Tambahan untuk Styling Logo --- */
+
+.sidebar-header {
+    padding: 1rem;
+    /* Sedikit penyesuaian padding */
+    justify-content: center;
+}
+
+.sidebar-logo {
+    max-width: 150px;
+    /* Lebar maksimum logo saat sidebar normal */
+    height: auto;
+    transition: max-width 0.3s ease-in-out;
+}
+
+.sidebar.collapsed .sidebar-logo {
+    max-width: 80px;
+    /* Lebar maksimum logo saat sidebar diperkecil */
+}
+
+/* Menghapus style lama yang tidak terpakai (opsional, tapi disarankan) */
+.sidebar.collapsed .sidebar-header .logo-text {
+    display: none;
+}
+
+/* --- Tambahan untuk Navbar Search & Profile --- */
+
+/* Penyesuaian Navbar Left */
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Form Pencarian */
+.search-form {
+    display: none;
+    /* Sembunyikan di mobile by default */
+}
+
+@media (min-width: 769px) {
+    .search-form {
+        display: block;
+        /* Tampilkan di desktop */
+    }
+}
+
+.search-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-container .bx-search {
+    position: absolute;
+    left: 1rem;
+    font-size: 1.2rem;
+    color: #9ca3af;
+    /* gray-400 */
+}
+
+.search-form input {
+    width: 320px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--content-bg);
+    padding-left: 3rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.search-form input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+/* Profile Dropdown */
+.profile-dropdown {
+    position: relative;
+}
+
+.profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.profile-trigger:hover {
+    background-color: var(--content-bg);
+}
+
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-name {
+    font-weight: 500;
+    display: none;
+    /* Sembunyikan nama di layar kecil */
+}
+
+@media (min-width: 769px) {
+    .profile-name {
+        display: inline;
+        /* Tampilkan nama di desktop */
+    }
+}
+
+.dropdown-arrow {
+    font-size: 1.2rem;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+}
+
+.profile-dropdown.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 200px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
+    padding: 0.5rem 0;
+    z-index: 1010;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.25s ease;
+}
+
+.profile-dropdown.active .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-color-dark);
+}
+
+.dropdown-item:hover {
+    background-color: var(--sidebar-link-hover-bg);
+}
+
+.dropdown-item i {
+    font-size: 1.1rem;
+}
+
+.dropdown-item.logout {
+    color: #ef4444;
+    /* red-500 */
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 0.5rem 0;
+}
+
+/* --- Tambahan untuk Section Dashboard --- */
+
+.dashboard-grid {
+    display: flex;
+    flex-wrap: wrap;
+    /* Agar responsif di layar kecil */
+    gap: 1.5rem;
+    /* Jarak antar kartu */
+}
+
+/* Kartu Ucapan Selamat Datang */
+.welcome-card {
+    flex: 1;
+    /* Mengambil ruang lebih banyak */
+    min-width: 300px;
+    background: linear-gradient(135deg, var(--primary-color), #60a5fa);
+    /* Gradien biru */
+    color: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-card h3 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.welcome-card p {
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    max-width: 450px;
+    opacity: 0.9;
+}
+
+.welcome-card .welcome-icon i {
+    font-size: 8rem;
+    opacity: 0.2;
+    transform: rotate(-15deg);
+}
+
+
+/* Kartu Statistik */
+.stats-card {
+    min-width: 280px;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stats-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 500;
+    color: #6b7280;
+    /* gray-500 */
+}
+
+.stats-body {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.stats-body .stats-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background-color: #e0f2fe;
+    /* light-blue */
+    color: var(--primary-color);
+}
+
+.stats-info p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    /* gray-500 */
+}
+
+.stats-info h3 {
+    font-size: 2rem;
+    color: var(--text-color-dark);
+    font-weight: 600;
+}
+
+/* Placeholder untuk konten selanjutnya */
+.next-section-placeholder {
+    margin-top: 1.5rem;
+    padding: 2rem;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+    color: #9ca3af;
+}
+
+.next-section-placeholder h2 {
+    color: var(--text-color-dark);
+}
