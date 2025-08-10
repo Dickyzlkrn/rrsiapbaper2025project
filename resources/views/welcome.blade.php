@@ -791,7 +791,7 @@
     <img src="{{ asset('assets/images/rripthbc.png') }}" 
          alt="Logo RRI" 
          style="height:70px; width:50px; vertical-align:middle; margin-right:8px;">
-    <span>SIAP BAPER RRI</span>
+    <span>SIAP BAPER RRI RANAI</span>
 </a>
 
 
