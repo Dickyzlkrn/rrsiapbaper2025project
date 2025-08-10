@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIAP BAPER RRI - Sistem Informasi Pengajuan Barang Perlengkapan</title>
+    <meta name="google-site-verification" content="hGITFWvC6oTWgLxrbIArOR2r5XPFu1Qj2lVNEnKcKmw" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
