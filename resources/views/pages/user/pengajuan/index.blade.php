@@ -69,5 +69,5 @@
     }
 
     // Auto refresh setiap 5 detik
-    setInterval(fetchPengajuan, 1000);
+    setInterval(fetchPengajuan, 5000);
 </script>
