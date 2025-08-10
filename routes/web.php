@@ -52,7 +52,7 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 // Untuk user
-Route::get('/user/pengajuan/refresh', [PengajuanController::class, 'refreshUserTable'])->name('user.pengajuan.refresh');
+Route::get('/user/pengajuan/refresh', [PengajuanController::class, 'refreshUserPengajuanTable'])->name('user.pengajuan.refresh');
 
 // Untuk admin
 Route::get('/tu/daftar/refresh', [PengajuanController::class, 'refreshAdminTable'])->name('tu.daftar.refresh');

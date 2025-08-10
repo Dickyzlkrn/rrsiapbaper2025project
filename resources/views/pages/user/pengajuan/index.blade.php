@@ -43,14 +43,13 @@
                 </tr>
             </thead>
             <tbody id="pengajuan-tbody">
-                @include('pages.user.pengajuan._tbody')
+                @include('pages.user.pengajuan.tbody')
             </tbody>
         </table>
     </div>
 </div>
 @endsection
 
-@section('scripts')
 <script>
     function fetchPengajuan() {
         const tanggal = document.querySelector('input[name="tanggal"]').value;
@@ -72,4 +71,3 @@
     // Auto refresh setiap 5 detik
     setInterval(fetchPengajuan, 1000);
 </script>
-@endsection

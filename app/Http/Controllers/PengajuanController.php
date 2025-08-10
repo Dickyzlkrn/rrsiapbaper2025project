@@ -36,7 +36,7 @@ class PengajuanController extends Controller
             ->whereDate('created_at', $tanggal)
             ->get();
 
-        $tbody = view('pages.user.pengajuan.partials.tbody', compact('pengajuans'))->render();
+        $tbody = view('pages.user.pengajuan.tbody', compact('pengajuans'))->render();
 
         return response()->json(['tbody' => $tbody]);
     }
