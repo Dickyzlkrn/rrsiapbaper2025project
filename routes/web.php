@@ -2,10 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PengajuanController;
 use App\Http\Controllers\StokBarangController;
 use App\Http\Controllers\AkunController;
+
+// === SYMLINK STORAGE ===
+Route::get('/storage-link', function () {
+    Artisan::call('storage:link');
+    return 'Symlink storage berhasil dibuat!';
+});
+
+// === LANDING PAGE ===
+Route::get('/', function () {
+    return view('welcome'); // File resources/views/welcome.blade.php
+})->name('landing');
 
 // === AUTH ===
 Route::get('/login', [AuthController::class, 'login'])->name('login')->middleware('guest');
@@ -15,20 +27,36 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // === SEMUA YANG SUDAH LOGIN ===
 Route::middleware('auth')->group(function () {
 
-    // Redirect berdasarkan role
-    Route::get('/', function () {
+    // === Redirect sesuai Role setelah login ===
+    Route::get('/redirect-dashboard', function () {
         $user = Auth::user();
-        return match ($user->role_id) {
-            1 => redirect()->route('tu.dashboard'),
-            2 => redirect()->route('user.dashboard'),
-            default => abort(403, 'Role tidak dikenali.')
-        };
+
+        if ($user->role_id == 1) {
+            return redirect()->route('tu.dashboard');
+        } elseif ($user->role_id == 2) {
+            return redirect()->route('user.dashboard');
+        } else {
+            abort(403, 'Role tidak dikenali.');
+        }
     })->name('root');
 
-    // === DASHBOARD ===
-    Route::get('/dashboard', function () {
-        return view('pages.dashboard.dashboard');
-    })->name('dashboard');
+Route::get('/dashboard', function () {
+    $user = Auth::user();
+    if ($user->role_id == 1) {
+        return redirect()->route('tu.dashboard');
+    } elseif ($user->role_id == 2) {
+        return redirect()->route('user.dashboard');
+    } else {
+        abort(403, 'Role tidak dikenali.');
+    }
+})->name('dashboard');
+
+// Untuk user
+Route::get('/user/pengajuan/refresh', [PengajuanController::class, 'refreshUserTable'])->name('user.pengajuan.refresh');
+
+// Untuk admin
+Route::get('/tu/daftar/refresh', [PengajuanController::class, 'refreshAdminTable'])->name('tu.daftar.refresh');
+
 
     // === DASHBOARD TU (ADMIN / TATA USAHA) ===
     Route::get('/tu/dashboard', [PengajuanController::class, 'dashboardTU'])->name('tu.dashboard');
@@ -44,6 +72,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/rekap-excel', [PengajuanController::class, 'exportExcelTU'])->name('rekap.excel');
         Route::get('/daftar/daftar-permintaan', [PengajuanController::class, 'liveTable'])->name('daftar.daftar-permintaan');
         Route::get('/pengajuan/pdf', [PengajuanController::class, 'generatePdf'])->name('pengajuan.pdf');
+
         // === MANAJEMEN AKUN ===
         Route::prefix('akun')->name('akun.')->group(function () {
             Route::get('/', [AkunController::class, 'index'])->name('index');
@@ -60,7 +89,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/pengajuan/{id}', [PengajuanController::class, 'updateTU'])->name('pengajuan.update');
         Route::delete('/pengajuan/{id}', [PengajuanController::class, 'destroyTU'])->name('pengajuan.delete');
         Route::patch('/pengajuan/{id}/status', [PengajuanController::class, 'updateStatus'])->name('pengajuan.update-status');
-
 
         // === STOK BARANG ===
         Route::prefix('stok')->name('stok.')->group(function () {
@@ -88,7 +116,7 @@ Route::middleware('auth')->group(function () {
 
     // === AUTOCOMPLETE NAMA BARANG ===
     Route::get('/stok/autocomplete', [StokBarangController::class, 'autocomplete'])->name('stok.autocomplete');
-    // ✅ Route untuk update checkbox AJAX
-    Route::post('/pengajuan/update-check', [PengajuanController::class, 'updateCheck'])->name('pengajuan.updateCheck');
 
+    // ✅ Update checkbox via AJAX
+    Route::post('/pengajuan/update-check', [PengajuanController::class, 'updateCheck'])->name('pengajuan.updateCheck');
 });

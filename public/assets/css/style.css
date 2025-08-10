@@ -26,6 +26,13 @@
     background-color: #ffc107;
 }
 
+.logo-icon {
+    height: 24px;   /* Sesuaikan dengan ukuran icon sebelumnya */
+    width: auto;    /* Biar proporsional */
+    vertical-align: middle;
+    margin-right: 8px; /* Jarak ke teks */
+}
+
 .status-disetujui {
     background-color: #28a745;
 }

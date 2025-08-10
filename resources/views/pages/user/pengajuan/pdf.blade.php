@@ -75,10 +75,12 @@
 
 <body>
 
-    {{-- Logo dan Header --}}
-    <div class="logo-header">
-        <img src="{{ public_path('assets/images/nb.png') }}" alt="Logo RRI" style="height: 60px;">
-    </div>
+{{-- Logo dan Header --}}
+<div class="logo-header">
+   <img src="{{ public_path('storage/nb.png') }}" style="height:60px;">
+
+
+</div>
 
     <table class="header-table">
         <tr>
@@ -146,13 +148,13 @@
             <td style="width: 50%; text-align: center;">
                 Yang Mengeluarkan,<br>
                 <strong>Operator Persediaan</strong><br><br>
-                @if(auth()->user()->signature)
-                    <img src="{{ public_path('storage/' . auth()->user()->signature) }}" alt="Tanda Tangan TU"
+                @if($admin && $admin->signature)
+                    <img src="{{ public_path('storage/' . $admin->signature) }}" alt="Tanda Tangan TU"
                         style="height: 60px; margin: 10px 0;">
                 @else
                     <div style="height: 60px;"></div>
                 @endif
-                <br><u>{{ auth()->user()->name }}</u><br>
+                <br><u>{{ $admin->name ?? '-' }}</u><br>
                 <small>Tata Usaha</small>
             </td>
             <td style="width: 50%; text-align: center;">

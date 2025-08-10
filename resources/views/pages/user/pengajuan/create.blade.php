@@ -48,7 +48,7 @@
                     <input type="number" name="items[0][jumlah]" class="form-control jumlah-barang" placeholder="Jumlah" min="1" required>
                 </div>
                 <div class="form-group" style="flex: 0.5;">
-                    <input type="text" class="form-control bg-light satuan-display" value="Satuan: -" readonly>
+                    <input type="text" class="form-control bg-light satuan-display" value=" " readonly>
                 </div>
                 <div class="form-group">
                     <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;" onclick="removeItemRow(this)">

@@ -68,6 +68,7 @@
                             <td>
                                 @if ($user->signature)
                                     <img src="{{ asset('storage/' . $user->signature) }}" alt="Tanda Tangan" style="height: 50px;">
+
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif

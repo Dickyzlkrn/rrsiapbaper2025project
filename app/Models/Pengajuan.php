@@ -15,6 +15,7 @@ class Pengajuan extends Model
         'ruangan',
         'keterangan',
         'status',
+        'approved_by', // tambah ini
     ];
 
     // Relasi: satu pengajuan punya banyak item
@@ -28,4 +29,9 @@ class Pengajuan extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function approvedBy()
+{
+    return $this->belongsTo(User::class, 'approved_by');
+}
+
 }

@@ -20,52 +20,60 @@ class StokBarangController extends Controller
     /**
      * Menampilkan daftar stok barang dengan fitur filter nama barang
      */
-    public function index(Request $request)
-    {
-        $query = StokBarang::query();
+   public function index(Request $request)
+{
+    $query = StokBarang::query();
 
-        // Filter nama barang
-        if ($request->filled('nama_barang')) {
-            $query->where('nama_barang', 'LIKE', '%' . $request->nama_barang . '%');
-        }
+    if ($request->filled('nama_barang')) {
+        $query->where('nama_barang', 'LIKE', '%' . $request->nama_barang . '%');
+    }
 
-        $stokBarangs = $query->orderBy('nama_barang')->limit(1000)->get();
+    $stokBarangs = $query->orderBy('nama_barang')->limit(1000)->get();
 
-        // Hitung pemakaian dan stok akhir berdasarkan filter tanggal
-        foreach ($stokBarangs as $barang) {
-            // Terpakai semua waktu (untuk stok_akhir sistem)
-            $terpakaiTotal = PengajuanItem::where('nama_barang', $barang->nama_barang)
-                ->whereHas('pengajuan', function ($q) {
-                    $q->where('status', 'disetujui');
+    foreach ($stokBarangs as $barang) {
+        // Total terpakai sepanjang waktu (semua pengajuan disetujui)
+        $terpakaiTotal = PengajuanItem::where('nama_barang', $barang->nama_barang)
+            ->whereHas('pengajuan', function ($q) {
+                $q->where('status', 'disetujui');
+            })
+            ->sum('jumlah');
+
+        // Cek filter tanggal
+        if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
+            $tanggalAwal = Carbon::parse($request->tanggal_awal)->startOfDay();
+            $tanggalAkhir = Carbon::parse($request->tanggal_akhir)->endOfDay();
+
+            // Hitung pemakaian dalam rentang filter
+            $terpakaiFilter = PengajuanItem::where('nama_barang', $barang->nama_barang)
+                ->whereHas('pengajuan', function ($q) use ($tanggalAwal, $tanggalAkhir) {
+                    $q->where('status', 'disetujui')
+                      ->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
                 })
                 ->sum('jumlah');
 
-            // Terpakai berdasarkan filter tanggal
-            $terpakaiQuery = PengajuanItem::where('nama_barang', $barang->nama_barang)
-                ->whereHas('pengajuan', function ($q) {
-                    $q->where('status', 'disetujui');
-                });
+            $barang->terpakai = $terpakaiFilter;
+        } else {
+            // Jika tidak filter tanggal, tampilkan pemakaian hanya hari ini saja
+            $hariIniAwal = Carbon::today()->startOfDay();
+            $hariIniAkhir = Carbon::today()->endOfDay();
 
-            if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
-                $tanggalAwal = Carbon::parse($request->tanggal_awal)->startOfDay();
-                $tanggalAkhir = Carbon::parse($request->tanggal_akhir)->endOfDay();
+            $terpakaiHariIni = PengajuanItem::where('nama_barang', $barang->nama_barang)
+                ->whereHas('pengajuan', function ($q) use ($hariIniAwal, $hariIniAkhir) {
+                    $q->where('status', 'disetujui')
+                      ->whereBetween('created_at', [$hariIniAwal, $hariIniAkhir]);
+                })
+                ->sum('jumlah');
 
-                $terpakaiQuery->whereHas('pengajuan', function ($q) use ($tanggalAwal, $tanggalAkhir) {
-                    $q->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
-                });
-            }
-
-            if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
-                $terpakaiFilter = $terpakaiQuery->sum('jumlah');
-                $barang->terpakai = $terpakaiFilter;
-            } else {
-                $barang->terpakai = 0; // default jika tidak difilter
-            }
-
-            $barang->stok_akhir_dinamis = ($barang->stok_awal + $barang->jumlah_masuk) - $terpakaiTotal;
+            $barang->terpakai = $terpakaiHariIni;
         }
-        return view('pages.tu.stok.index', compact('stokBarangs'));
+
+        // Hitung stok akhir berdasarkan total pemakaian sepanjang waktu
+        $barang->stok_akhir_dinamis = ($barang->stok_awal + $barang->jumlah_masuk) - $terpakaiTotal;
     }
+
+    return view('pages.tu.stok.index', compact('stokBarangs'));
+}
+
 
 
 
