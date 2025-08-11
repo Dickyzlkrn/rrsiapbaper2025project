@@ -168,21 +168,27 @@ class StokBarangController extends Controller
      * Untuk fitur autocomplete nama barang (misalnya di form pengajuan)
      */
     public function autocomplete(Request $request)
-    {
-        $term = $request->get('term');
+{
+    $term = $request->get('term');
 
-        $stok = StokBarang::where('nama_barang', 'like', '%' . $term . '%')->get();
+    $stok = StokBarang::where('nama_barang', 'like', '%' . $term . '%')->get();
 
-        $result = $stok->map(function ($item) {
-            return [
-                'label' => $item->nama_barang,
-                'value' => $item->nama_barang,
-                'satuan' => $item->satuan ?? '-', // ini tambahan penting
-            ];
-        });
+    $result = $stok->map(function ($item) {
+        // Hitung stok akhir dinamis
+        $terpakai = $this->getTotalPemakaian($item->nama_barang);
+        $stokAkhir = ($item->stok_awal + $item->jumlah_masuk) - $terpakai;
 
-        return response()->json($result);
-    }
+        return [
+            'label' => $item->nama_barang,
+            'value' => $item->nama_barang,
+            'satuan' => $item->satuan ?? '-',
+            'stok_akhir' => $stokAkhir,
+        ];
+    });
+
+    return response()->json($result);
+}
+
 
     private function getTotalPemakaian($nama_barang)
     {

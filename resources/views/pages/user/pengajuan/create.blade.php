@@ -35,21 +35,35 @@
                 <label for="ruangan">Ruangan <span class="text-danger">*</span></label>
                 <input type="text" id="ruangan" name="ruangan" class="form-control" value="{{ old('ruangan') }}" required>
             </div>
-        </div>
 
+            {{-- Kolom keterangan --}}
+            <div class="form-group" style="grid-column: span 2;">
+                <label for="keterangan">Keterangan</label>
+                <input type="text" id="keterangan" name="keterangan" class="form-control" value="{{ old('keterangan') }}">
+            </div>
+        </div>
+        
         <hr>
         <h5>Detail Barang</h5>
         <div id="items-container">
             <div class="form-grid item-row mb-2" style="display: flex; gap: 10px; align-items: center;">
+                <!-- Nama Barang -->
                 <div class="form-group" style="flex: 1;">
                     <input type="text" name="items[0][nama_barang]" class="form-control autocomplete-barang" placeholder="Nama Barang" required>
                 </div>
+                <!-- Jumlah -->
                 <div class="form-group" style="flex: 0.5;">
                     <input type="number" name="items[0][jumlah]" class="form-control jumlah-barang" placeholder="Jumlah" min="1" required>
                 </div>
+                <!-- Satuan -->
                 <div class="form-group" style="flex: 0.5;">
-                    <input type="text" class="form-control bg-light satuan-display" value=" " readonly>
+                    <input type="text" class="form-control bg-light satuan-display" value="-" readonly>
                 </div>
+                <!-- Stok Akhir -->
+                <div class="form-group" style="flex: 0.5;">
+                    <input type="text" class="form-control bg-light stok-display" value="-" readonly>
+                </div>
+                <!-- Tombol hapus -->
                 <div class="form-group">
                     <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;" onclick="removeItemRow(this)">
                         <i class="bx bx-trash"></i>
@@ -79,7 +93,7 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
 <style>
-    .satuan-display[value="Satuan: -"] {
+    .satuan-display[value="Satuan: -"], .stok-display[value="-"] {
         color: red;
         font-weight: bold;
     }
@@ -99,7 +113,10 @@
                 <input type="number" name="items[${itemIndex}][jumlah]" class="form-control jumlah-barang" placeholder="Jumlah" min="1" required>
             </div>
             <div class="form-group" style="flex: 0.5;">
-                <input type="text" class="form-control bg-light satuan-display" value="Satuan: -" readonly>
+                <input type="text" class="form-control bg-light satuan-display" value="-" readonly>
+            </div>
+            <div class="form-group" style="flex: 0.5;">
+                <input type="text" class="form-control bg-light stok-display" value="-" readonly>
             </div>
             <div class="form-group">
                 <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;" onclick="removeItemRow(this)">
@@ -132,12 +149,15 @@
                                 response(data);
                                 const row = input.closest('.item-row');
                                 const satuanDisplay = row.querySelector('.satuan-display');
+                                const stokDisplay = row.querySelector('.stok-display');
 
                                 if (data.length === 0) {
-                                    satuanDisplay.value = 'Satuan: -';
+                                    satuanDisplay.value = '-';
+                                    stokDisplay.value = '-';
                                     input.dataset.valid = "false";
                                 } else {
-                                    satuanDisplay.value = 'Satuan: -';
+                                    satuanDisplay.value = '-';
+                                    stokDisplay.value = '-';
                                     input.dataset.valid = "true";
                                 }
 
@@ -149,10 +169,18 @@
                     select: function (event, ui) {
                         const row = input.closest('.item-row');
                         const satuanDisplay = row.querySelector('.satuan-display');
+                        const stokDisplay = row.querySelector('.stok-display');
                         const jumlahInput = row.querySelector('.jumlah-barang');
 
-                        satuanDisplay.value = 'Satuan: ' + (ui.item.satuan ?? '-');
-                        jumlahInput.removeAttribute('max');
+                        satuanDisplay.value = ui.item.satuan ?? '-';
+
+                        if (ui.item.stok_akhir !== undefined) {
+                            stokDisplay.value = ui.item.stok_akhir;
+                            jumlahInput.setAttribute('max', ui.item.stok_akhir);
+                        } else {
+                            stokDisplay.value = '-';
+                            jumlahInput.removeAttribute('max');
+                        }
 
                         input.dataset.valid = "true";
                         toggleSubmitButton();
@@ -163,7 +191,9 @@
                     this.dataset.valid = "false";
                     const row = this.closest('.item-row');
                     const satuanDisplay = row.querySelector('.satuan-display');
-                    satuanDisplay.value = 'Satuan: -';
+                    const stokDisplay = row.querySelector('.stok-display');
+                    satuanDisplay.value = '-';
+                    stokDisplay.value = '-';
                     toggleSubmitButton();
                 });
 
