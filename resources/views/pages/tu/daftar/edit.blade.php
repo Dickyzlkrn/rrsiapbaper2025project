@@ -12,7 +12,7 @@
             </a>
         </div>
 
-        @if($errors->any())
+        @if ($errors->any())
             <div class="alert alert-danger">
                 <i class='bx bxs-error-circle'></i>
                 <ul class="m-0 pl-3">
@@ -49,9 +49,12 @@
                 <div class="form-group" style="grid-column: span 2;">
                     <label for="status">Status <span class="text-danger">*</span></label>
                     <select id="status" name="status" class="form-control" required>
-                        <option value="diajukan" {{ old('status', $pengajuan->status) == 'diajukan' ? 'selected' : '' }}>Diajukan</option>
-                        <option value="disetujui" {{ old('status', $pengajuan->status) == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                        <option value="ditolak" {{ old('status', $pengajuan->status) == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                        <option value="diajukan" {{ old('status', $pengajuan->status) == 'diajukan' ? 'selected' : '' }}>
+                            Diajukan</option>
+                        <option value="disetujui" {{ old('status', $pengajuan->status) == 'disetujui' ? 'selected' : '' }}>
+                            Disetujui</option>
+                        <option value="ditolak" {{ old('status', $pengajuan->status) == 'ditolak' ? 'selected' : '' }}>
+                            Ditolak</option>
                     </select>
                 </div>
             </div>
@@ -67,26 +70,30 @@
                     @endphp
                     <div class="form-grid item-row mb-2" style="display: flex; gap: 10px; align-items: center;">
                         <div class="form-group" style="flex: 1;">
-                            <input type="text" name="items[{{ $index }}][nama_barang]" class="form-control" 
-                                   placeholder="Nama Barang" value="{{ old("items.$index.nama_barang", $item->nama_barang) }}" required>
+                            <label for="nama_barang_{{ $index }}">Nama Barang</label>
+                            <input type="text" name="items[{{ $index }}][nama_barang]" class="form-control"
+                                placeholder="Nama Barang" value="{{ old("items.$index.nama_barang", $item->nama_barang) }}"
+                                required>
                         </div>
                         <div class="form-group" style="flex: 0.5;">
-                            <input type="number" name="items[{{ $index }}][jumlah]" 
-                                   class="form-control item-jumlah {{ $overLimit ? 'is-invalid' : '' }}" 
-                                   placeholder="Jumlah" min="1" 
-                                   value="{{ old("items.$index.jumlah", $item->jumlah) }}" 
-                                   data-nama="{{ $item->nama_barang }}" required>
+                            <label for="jumlah_{{ $index }}">Jumlah</label>
+                            <input type="number" name="items[{{ $index }}][jumlah]"
+                                class="form-control item-jumlah {{ $overLimit ? 'is-invalid' : '' }}" placeholder="Jumlah"
+                                min="1" value="{{ old("items.$index.jumlah", $item->jumlah) }}"
+                                data-nama="{{ $item->nama_barang }}" required>
                             <div class="text-danger error-msg" style="{{ $overLimit ? '' : 'display: none' }}">
-                                @if($overLimit)
+                                @if ($overLimit)
                                     Melebihi stok tersedia ({{ $stokAkhir }})
                                 @endif
                             </div>
                         </div>
                         <div class="form-group" style="flex: 0.5;">
+                            <label for="stok_{{ $index }}">Stok Akhir</label>
                             <input type="text" class="form-control bg-light" value="Stok: {{ $stokAkhir }}" readonly>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;" onclick="removeItemRow(this)">
+                            <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;"
+                                onclick="removeItemRow(this)">
                                 <i class="bx bx-trash"></i>
                             </button>
                         </div>
@@ -94,8 +101,10 @@
                 @endforeach
             </div>
 
+
             <div class="mb-3">
-                <button type="button" class="btn-submit" style="background-color: #6c757d; color: white;" onclick="addItemRow()">
+                <button type="button" class="btn-submit" style="background-color: #6c757d; color: white;"
+                    onclick="addItemRow()">
                     <i class='bx bx-plus'></i> <span>Tambah Barang</span>
                 </button>
             </div>
@@ -151,7 +160,8 @@
             let valid = true;
             document.querySelectorAll('.item-row').forEach(row => {
                 const jumlahInput = row.querySelector('.item-jumlah');
-                const nama = jumlahInput.dataset.nama || row.querySelector('input[name*="[nama_barang]"]').value.trim();
+                const nama = jumlahInput.dataset.nama || row.querySelector('input[name*="[nama_barang]"]').value
+                    .trim();
                 const jumlah = parseInt(jumlahInput.value) || 0;
                 const stok = stokList[nama] ?? 0;
                 const errorDiv = row.querySelector('.error-msg');
@@ -173,7 +183,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             validateStok();
-            document.getElementById('items-container').addEventListener('input', function (e) {
+            document.getElementById('items-container').addEventListener('input', function(e) {
                 if (e.target && e.target.classList.contains('item-jumlah')) {
                     validateStok();
                 }
