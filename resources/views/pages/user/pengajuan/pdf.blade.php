@@ -75,12 +75,10 @@
 
 <body>
 
-{{-- Logo dan Header --}}
-<div class="logo-header">
-   <img src="{{ public_path('storage/nb.png') }}" style="height:60px;">
-
-
-</div>
+    {{-- Logo dan Header --}}
+    <div class="logo-header">
+        <img src="{{ public_path('storage/nb.png') }}" style="height:60px;">
+    </div>
 
     <table class="header-table">
         <tr>
@@ -116,10 +114,6 @@
             <td><strong>Status</strong></td>
             <td>: {{ strtoupper($pengajuan->status) }}</td>
         </tr>
-        <tr>
-            <td><strong>Keterangan</strong></td>
-            <td>: {{ $pengajuan->keterangan ?? '-' }}</td>
-        </tr>
     </table>
 
     {{-- Tabel Barang --}}
@@ -129,6 +123,7 @@
                 <th class="center" width="5%">No</th>
                 <th>Nama Barang</th>
                 <th class="center" width="15%">Jumlah</th>
+                <th class="center" width="30%">Keterangan Kecil</th>
             </tr>
         </thead>
         <tbody>
@@ -137,6 +132,7 @@
                     <td class="center">{{ $i + 1 }}</td>
                     <td>{{ $item->nama_barang }}</td>
                     <td class="center">{{ $item->jumlah }}</td>
+                    <td>{{ $item->keterangan_kecil ?? '-' }}</td>
                 </tr>
             @endforeach
         </tbody>

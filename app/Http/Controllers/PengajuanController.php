@@ -26,7 +26,6 @@ class PengajuanController extends Controller
         return view('pages.user.pengajuan.index', compact('pengajuans'));
     }
 
-    // Method yang sudah di-rename supaya tidak bentrok
     public function refreshUserPengajuanTable(Request $request)
     {
         $tanggal = $request->input('tanggal', date('Y-m-d'));
@@ -79,6 +78,7 @@ class PengajuanController extends Controller
             'items' => 'required|array|min:1',
             'items.*.nama_barang' => 'required|string|max:255',
             'items.*.jumlah' => 'required|integer|min:1',
+            'items.*.keterangan_kecil' => 'nullable|string|max:255',
         ]);
 
         $pengajuan = Pengajuan::create([
@@ -91,9 +91,10 @@ class PengajuanController extends Controller
 
         foreach ($request->items as $item) {
             PengajuanItem::create([
-                'pengajuan_id' => $pengajuan->id,
-                'nama_barang' => $item['nama_barang'],
-                'jumlah' => $item['jumlah'],
+                'pengajuan_id'    => $pengajuan->id,
+                'nama_barang'     => $item['nama_barang'],
+                'jumlah'          => $item['jumlah'],
+                'keterangan_kecil'=> $item['keterangan_kecil'] ?? null,
             ]);
         }
 
@@ -115,21 +116,26 @@ class PengajuanController extends Controller
             'items' => 'required|array|min:1',
             'items.*.nama_barang' => 'required|string|max:255',
             'items.*.jumlah' => 'required|integer|min:1',
+            'items.*.keterangan_kecil' => 'nullable|string|max:255',
         ]);
 
         $pengajuan = Pengajuan::where('user_id', Auth::id())->findOrFail($id);
+
         $pengajuan->update([
             'nama_pengaju' => $request->nama_pengaju,
-            'ruangan' => $request->ruangan,
-            'keterangan' => $request->keterangan,
+            'ruangan'      => $request->ruangan,
+            'keterangan'   => $request->keterangan,
         ]);
 
+        // refresh items (hapus lalu recreate dengan keterangan_kecil)
         $pengajuan->items()->delete();
+
         foreach ($request->items as $item) {
             PengajuanItem::create([
-                'pengajuan_id' => $pengajuan->id,
-                'nama_barang' => $item['nama_barang'],
-                'jumlah' => $item['jumlah'],
+                'pengajuan_id'    => $pengajuan->id,
+                'nama_barang'     => $item['nama_barang'],
+                'jumlah'          => $item['jumlah'],
+                'keterangan_kecil'=> $item['keterangan_kecil'] ?? null,
             ]);
         }
 
@@ -240,15 +246,13 @@ class PengajuanController extends Controller
         return redirect()->back()->with('success', 'Pengajuan berhasil dihapus.');
     }
 
-public function editTU($id)
-{
-    $pengajuan = Pengajuan::with('items')->findOrFail($id);
-    
-    // Ambil semua stok barang untuk validasi di form
-    $stokList = \App\Models\StokBarang::pluck('stok_akhir', 'nama_barang')->toArray();
+    public function editTU($id)
+    {
+        $pengajuan = Pengajuan::with('items')->findOrFail($id);
+        $stokList = \App\Models\StokBarang::pluck('stok_akhir', 'nama_barang')->toArray();
 
-    return view('pages.tu.daftar.edit', compact('pengajuan', 'stokList'));
-}
+        return view('pages.tu.daftar.edit', compact('pengajuan', 'stokList'));
+    }
 
     public function updateTU(Request $request, $id)
     {
@@ -260,6 +264,7 @@ public function editTU($id)
             'items' => 'required|array|min:1',
             'items.*.nama_barang' => 'required|string|max:255',
             'items.*.jumlah' => 'required|integer|min:1',
+            'items.*.keterangan_kecil' => 'nullable|string|max:255',
         ]);
 
         $pengajuan = Pengajuan::findOrFail($id);
@@ -269,19 +274,20 @@ public function editTU($id)
 
         $pengajuan->update([
             'nama_pengaju' => $request->nama_pengaju,
-            'ruangan' => $request->ruangan,
-            'keterangan' => $request->keterangan,
-            'status' => $statusBaru,
-            'approved_by' => $statusBaru === 'disetujui' ? Auth::id() : null,
+            'ruangan'      => $request->ruangan,
+            'keterangan'   => $request->keterangan,
+            'status'       => $statusBaru,
+            'approved_by'  => $statusBaru === 'disetujui' ? Auth::id() : null,
         ]);
 
         $pengajuan->items()->delete();
 
         foreach ($request->items as $item) {
             PengajuanItem::create([
-                'pengajuan_id' => $pengajuan->id,
-                'nama_barang' => $item['nama_barang'],
-                'jumlah' => $item['jumlah'],
+                'pengajuan_id'    => $pengajuan->id,
+                'nama_barang'     => $item['nama_barang'],
+                'jumlah'          => $item['jumlah'],
+                'keterangan_kecil'=> $item['keterangan_kecil'] ?? null,
             ]);
         }
 

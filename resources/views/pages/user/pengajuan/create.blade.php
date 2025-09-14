@@ -38,7 +38,7 @@
                         required>
                 </div>
 
-                {{-- Kolom keterangan --}}
+                {{-- Kolom keterangan besar --}}
                 <div class="form-group" style="grid-column: span 2;">
                     <label for="keterangan">Keterangan</label>
                     <input type="text" id="keterangan" name="keterangan" class="form-control"
@@ -51,29 +51,42 @@
 
             <div id="items-container">
                 <div class="form-grid item-row mb-2"
-                    style="display: grid; grid-template-columns: 3fr 1fr 1fr 1fr auto; gap: 10px; align-items: end;">
+                    style="display: grid; grid-template-columns: 3fr 1fr 1fr 2fr 1fr auto; gap: 10px; align-items: end;">
+                    
+                    <!-- Nama Barang -->
                     <div class="form-group">
                         <label for="nama_barang">Nama Barang</label>
                         <input type="text" name="items[0][nama_barang]" class="form-control autocomplete-barang"
                             placeholder="Nama Barang" required>
                     </div>
 
+                    <!-- Jumlah -->
                     <div class="form-group">
                         <label for="jumlah">Jumlah</label>
                         <input type="number" name="items[0][jumlah]" class="form-control jumlah-barang"
                             placeholder="Jumlah" min="1" required>
                     </div>
 
+                    <!-- Satuan -->
                     <div class="form-group">
                         <label for="satuan">Satuan</label>
                         <input type="text" class="form-control bg-light satuan-display" value="-" readonly>
                     </div>
 
+                    <!-- Keterangan Kecil -->
+                    <div class="form-group">
+                        <label for="keterangan_kecil">Keterangan Kecil</label>
+                        <input type="text" name="items[0][keterangan_kecil]" class="form-control"
+                            placeholder="Keterangan (opsional)">
+                    </div>
+
+                    <!-- Stok Akhir -->
                     <div class="form-group">
                         <label for="stok">Stok Akhir</label>
                         <input type="text" class="form-control bg-light stok-display" value="-" readonly>
                     </div>
 
+                    <!-- Tombol Hapus -->
                     <div class="form-group">
                         <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;"
                             onclick="removeItemRow(this)">
@@ -82,7 +95,6 @@
                     </div>
                 </div>
             </div>
-
 
             <div class="mb-3">
                 <button type="button" class="btn-submit" style="background-color: #6c757d; color: white;"
@@ -106,7 +118,7 @@
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
     <style>
-        .satuan-display[value="Satuan: -"],
+        .satuan-display[value="-"],
         .stok-display[value="-"] {
             color: red;
             font-weight: bold;
@@ -119,7 +131,9 @@
         function addItemRow() {
             const container = document.getElementById('items-container');
             const html = `
-            <div class="form-grid item-row mb-2" style="display: grid; grid-template-columns: 3fr 1fr 1fr 1fr auto; gap: 10px; align-items: center;">
+            <div class="form-grid item-row mb-2" 
+                style="display: grid; grid-template-columns: 3fr 1fr 1fr 2fr 1fr auto; gap: 10px; align-items: center;">
+                
                 <!-- Nama Barang -->
                 <div class="form-group">
                     <input type="text" name="items[${itemIndex}][nama_barang]" class="form-control autocomplete-barang" placeholder="Nama Barang" required>
@@ -133,6 +147,11 @@
                 <!-- Satuan -->
                 <div class="form-group">
                     <input type="text" class="form-control bg-light satuan-display" value="-" readonly>
+                </div>
+
+                <!-- Keterangan Kecil -->
+                <div class="form-group">
+                    <input type="text" name="items[${itemIndex}][keterangan_kecil]" class="form-control" placeholder="Keterangan (opsional)">
                 </div>
 
                 <!-- Stok Akhir -->
@@ -168,15 +187,12 @@
                         source: function(request, response) {
                             $.ajax({
                                 url: '{{ route('stok.autocomplete') }}',
-                                data: {
-                                    term: request.term
-                                },
+                                data: { term: request.term },
                                 success: function(data) {
                                     response(data);
 
                                     const row = input.closest('.item-row');
-                                    const satuanDisplay = row.querySelector(
-                                        '.satuan-display');
+                                    const satuanDisplay = row.querySelector('.satuan-display');
                                     const stokDisplay = row.querySelector('.stok-display');
 
                                     if (data.length === 0) {
@@ -246,5 +262,4 @@
 
         document.addEventListener('DOMContentLoaded', enableAutocomplete);
     </script>
-
 @endsection

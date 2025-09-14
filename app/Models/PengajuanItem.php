@@ -13,6 +13,8 @@ class PengajuanItem extends Model
         'pengajuan_id',
         'nama_barang',
         'jumlah',
+        'keterangan', // ✅ tambahkan field keterangan
+         'keterangan_kecil',
     ];
 
     // Relasi: item ini milik satu pengajuan

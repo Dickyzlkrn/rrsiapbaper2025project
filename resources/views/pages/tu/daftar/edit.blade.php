@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="form-group" style="grid-column: span 2;">
-                    <label for="keterangan">Keterangan</label>
+                    <label for="keterangan">Keterangan Umum</label>
                     <input type="text" id="keterangan" name="keterangan" class="form-control"
                         value="{{ old('keterangan', $pengajuan->keterangan) }}">
                 </div>
@@ -68,18 +68,20 @@
                         $stokAkhir = $stok?->stok_akhir ?? 0;
                         $overLimit = $item->jumlah > $stokAkhir;
                     @endphp
-                    <div class="form-grid item-row mb-2" style="display: flex; gap: 10px; align-items: center;">
+                    <div class="form-grid item-row mb-2" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        {{-- Nama Barang --}}
                         <div class="form-group" style="flex: 1;">
-                            <label for="nama_barang_{{ $index }}">Nama Barang</label>
+                            <label>Nama Barang</label>
                             <input type="text" name="items[{{ $index }}][nama_barang]" class="form-control"
-                                placeholder="Nama Barang" value="{{ old("items.$index.nama_barang", $item->nama_barang) }}"
-                                required>
+                                value="{{ old("items.$index.nama_barang", $item->nama_barang) }}" required>
                         </div>
+
+                        {{-- Jumlah --}}
                         <div class="form-group" style="flex: 0.5;">
-                            <label for="jumlah_{{ $index }}">Jumlah</label>
+                            <label>Jumlah</label>
                             <input type="number" name="items[{{ $index }}][jumlah]"
-                                class="form-control item-jumlah {{ $overLimit ? 'is-invalid' : '' }}" placeholder="Jumlah"
-                                min="1" value="{{ old("items.$index.jumlah", $item->jumlah) }}"
+                                class="form-control item-jumlah {{ $overLimit ? 'is-invalid' : '' }}"
+                                value="{{ old("items.$index.jumlah", $item->jumlah) }}" min="1"
                                 data-nama="{{ $item->nama_barang }}" required>
                             <div class="text-danger error-msg" style="{{ $overLimit ? '' : 'display: none' }}">
                                 @if ($overLimit)
@@ -87,10 +89,21 @@
                                 @endif
                             </div>
                         </div>
+
+                        {{-- Stok Akhir --}}
                         <div class="form-group" style="flex: 0.5;">
-                            <label for="stok_{{ $index }}">Stok Akhir</label>
+                            <label>Stok Akhir</label>
                             <input type="text" class="form-control bg-light" value="Stok: {{ $stokAkhir }}" readonly>
                         </div>
+
+                        {{-- Keterangan Kecil per barang --}}
+                        <div class="form-group" style="flex: 1;">
+                            <label>Keterangan Kecil</label>
+                            <input type="text" name="items[{{ $index }}][keterangan_kecil]" class="form-control"
+                                value="{{ old("items.$index.keterangan_kecil", $item->keterangan_kecil) }}">
+                        </div>
+
+                        {{-- Hapus row --}}
                         <div class="form-group">
                             <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;"
                                 onclick="removeItemRow(this)">
@@ -100,7 +113,6 @@
                     </div>
                 @endforeach
             </div>
-
 
             <div class="mb-3">
                 <button type="button" class="btn-submit" style="background-color: #6c757d; color: white;"
@@ -126,7 +138,7 @@
         function addItemRow() {
             const container = document.getElementById('items-container');
             const html = `
-                <div class="form-grid item-row mb-2" style="display: flex; gap: 10px; align-items: center;">
+                <div class="form-grid item-row mb-2" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <div class="form-group" style="flex: 1;">
                         <input type="text" name="items[${itemIndex}][nama_barang]" class="form-control" placeholder="Nama Barang" required>
                     </div>
@@ -136,6 +148,9 @@
                     </div>
                     <div class="form-group" style="flex: 0.5;">
                         <input type="text" class="form-control bg-light" placeholder="Stok: -" readonly>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <input type="text" name="items[${itemIndex}][keterangan_kecil]" class="form-control" placeholder="Keterangan Kecil">
                     </div>
                     <div class="form-group">
                         <button type="button" class="btn-submit" style="background-color: #e74c3c; color: white;" onclick="removeItemRow(this)">
@@ -160,8 +175,7 @@
             let valid = true;
             document.querySelectorAll('.item-row').forEach(row => {
                 const jumlahInput = row.querySelector('.item-jumlah');
-                const nama = jumlahInput.dataset.nama || row.querySelector('input[name*="[nama_barang]"]').value
-                    .trim();
+                const nama = jumlahInput.dataset.nama || row.querySelector('input[name*="[nama_barang]"]').value.trim();
                 const jumlah = parseInt(jumlahInput.value) || 0;
                 const stok = stokList[nama] ?? 0;
                 const errorDiv = row.querySelector('.error-msg');

@@ -8,14 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Pengajuan extends Model
 {
     use HasFactory;
+
     protected $table = 'pengajuan';
+
     protected $fillable = [
         'user_id',
         'nama_pengaju',
         'ruangan',
         'keterangan',
         'status',
-        'approved_by', // tambah ini
+        'approved_by',
     ];
 
     // Relasi: satu pengajuan punya banyak item
@@ -24,14 +26,14 @@ class Pengajuan extends Model
         return $this->hasMany(PengajuanItem::class);
     }
 
-    // Relasi opsional ke user (jika pakai auth)
+    // Relasi opsional ke user
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-    public function approvedBy()
-{
-    return $this->belongsTo(User::class, 'approved_by');
-}
 
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
 }
