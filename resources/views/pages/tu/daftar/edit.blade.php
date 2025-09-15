@@ -98,7 +98,7 @@
 
                         {{-- Keterangan Kecil per barang --}}
                         <div class="form-group" style="flex: 1;">
-                            <label>Keterangan Kecil</label>
+                            <label>Keterangan</label>
                             <input type="text" name="items[{{ $index }}][keterangan_kecil]" class="form-control"
                                 value="{{ old("items.$index.keterangan_kecil", $item->keterangan_kecil) }}">
                         </div>

@@ -75,7 +75,7 @@
 
                     <!-- Keterangan Kecil -->
                     <div class="form-group">
-                        <label for="keterangan_kecil">Keterangan Kecil</label>
+                        <label for="keterangan_kecil">Keterangan</label>
                         <input type="text" name="items[0][keterangan_kecil]" class="form-control"
                             placeholder="Keterangan (opsional)">
                     </div>

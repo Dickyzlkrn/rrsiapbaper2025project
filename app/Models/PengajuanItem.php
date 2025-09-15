@@ -14,12 +14,16 @@ class PengajuanItem extends Model
         'nama_barang',
         'jumlah',
         'keterangan', // ✅ tambahkan field keterangan
-         'keterangan_kecil',
+        'keterangan_kecil',
     ];
 
     // Relasi: item ini milik satu pengajuan
     public function pengajuan()
     {
         return $this->belongsTo(Pengajuan::class);
+    }
+    public function stokBarang()
+    {
+        return $this->belongsTo(StokBarang::class, 'nama_barang', 'nama_barang');
     }
 }

@@ -122,7 +122,8 @@
             <tr>
                 <th class="center" width="5%">No</th>
                 <th>Nama Barang</th>
-                <th class="center" width="15%">Jumlah</th>
+                <th class="center" width="10%">Jumlah</th>
+                <th class="center" width="15%">Satuan</th> {{-- kolom baru --}}
                 <th class="center" width="30%">Keterangan Kecil</th>
             </tr>
         </thead>
@@ -132,6 +133,7 @@
                     <td class="center">{{ $i + 1 }}</td>
                     <td>{{ $item->nama_barang }}</td>
                     <td class="center">{{ $item->jumlah }}</td>
+                    <td class="center">{{ $item->stokBarang->satuan ?? '-' }}</td> {{-- ambil dari stok --}}
                     <td>{{ $item->keterangan_kecil ?? '-' }}</td>
                 </tr>
             @endforeach
