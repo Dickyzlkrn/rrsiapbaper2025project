@@ -124,7 +124,7 @@
                 <th>Nama Barang</th>
                 <th class="center" width="10%">Jumlah</th>
                 <th class="center" width="15%">Satuan</th> {{-- kolom baru --}}
-                <th class="center" width="30%">Keterangan Kecil</th>
+                <th class="center" width="30%">Keterangan</th>
             </tr>
         </thead>
         <tbody>
