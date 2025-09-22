@@ -47,7 +47,7 @@ Route::get('/dashboard', function () {
     } elseif ($user->role_id == 2) {
         return redirect()->route('user.dashboard');
     } else {
-        abort(403, 'Role tidak dikenali.');
+        abort(403, 'Role tidak dikenali!.');
     }
 })->name('dashboard');
 
