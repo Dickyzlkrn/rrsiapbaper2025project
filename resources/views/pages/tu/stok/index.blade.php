@@ -20,17 +20,30 @@
             <div class="form-filter-group d-flex gap-3 align-items-end flex-wrap">
                 <div>
                     <label for="nama_barang">Nama Barang</label>
-                    <input type="text" name="nama_barang" id="nama_barang" value="{{ request('nama_barang') }}"
-                        class="form-control" placeholder="Cari nama barang...">
+                    <input 
+                        type="text" 
+                        name="nama_barang" 
+                        id="nama_barang" 
+                        value="{{ request('nama_barang') }}"
+                        class="form-control" 
+                        placeholder="Cari nama barang...">
                 </div>
                 <div>
                     <label for="tanggal_awal">Dari Tanggal</label>
-                    <input type="date" name="tanggal_awal" id="tanggal_awal" value="{{ request('tanggal_awal') }}"
+                    <input 
+                        type="date" 
+                        name="tanggal_awal" 
+                        id="tanggal_awal" 
+                        value="{{ request('tanggal_awal') }}" 
                         class="form-control">
                 </div>
                 <div>
                     <label for="tanggal_akhir">Sampai Tanggal</label>
-                    <input type="date" name="tanggal_akhir" id="tanggal_akhir" value="{{ request('tanggal_akhir') }}"
+                    <input 
+                        type="date" 
+                        name="tanggal_akhir" 
+                        id="tanggal_akhir" 
+                        value="{{ request('tanggal_akhir') }}" 
                         class="form-control">
                 </div>
                 <div>
@@ -58,8 +71,6 @@
                 sampai 
                 <strong>{{ \Carbon\Carbon::parse(request('tanggal_akhir'))->format('d-m-Y') }}</strong>.
             </div>
-        @else
-
         @endif
 
         {{-- Notifikasi --}}
@@ -83,28 +94,40 @@
                         <th>Jumlah Masuk</th>
                         <th>Terpakai</th>
                         <th>Stok Akhir</th>
-                        <th>Aksi</th> {{-- Kolom Aksi (Edit & Hapus) --}}
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($stokBarangs as $barang)
+                    @forelse ($stokBarangs as $barang)
                         <tr @if(($barang->stok_akhir_dinamis ?? 0) <= 0) style="background-color: #ffe5e5;" @endif>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $barang->nama_barang }}</td>
-                            <td>{{ $barang->created_at->format('d-m-Y H:i') }}</td> {{-- Tanggal barang ditambahkan --}}
+                            <td>{{ $barang->created_at ? $barang->created_at->format('d-m-Y H:i') : '-' }}</td>
                             <td>{{ $barang->satuan ?? '-' }}</td>
-                            <td>{{ $barang->stok_awal }}</td>
-                            <td>{{ $barang->jumlah_masuk }}</td>
+
+                            {{-- ✅ Gunakan stok_awal_bulan (hasil dinamis dari controller) --}}
+                            <td>{{ $barang->stok_awal_bulan ?? $barang->stok_awal }}</td>
+
+                            {{-- ✅ Gunakan jumlah masuk hasil perhitungan bulan filter --}}
+                            <td>{{ $barang->jumlah_masuk_bulan ?? $barang->jumlah_masuk }}</td>
+
+                            {{-- ✅ Pemakaian selama bulan yang difilter --}}
                             <td>{{ $barang->terpakai ?? 0 }}</td>
-                            <td>{{ $barang->stok_akhir_dinamis ?? $barang->stok_awal + $barang->jumlah_masuk }}</td>
+
+                            {{-- ✅ Stok akhir hasil perhitungan dinamis --}}
+                            <td>
+                                {{ $barang->stok_akhir_dinamis ?? (($barang->stok_awal + $barang->jumlah_masuk) - ($barang->terpakai ?? 0)) }}
+                            </td>
+
                             <td>
                                 <div class="action-buttons d-flex gap-1">
-                                    <a href="{{ route('tu.stok.edit', $barang->id) }}" class="btn-action btn-edit"
-                                        title="Edit Stok">
+                                    <a href="{{ route('tu.stok.edit', $barang->id) }}" 
+                                       class="btn-action btn-edit" title="Edit Stok">
                                         <i class='bx bxs-pencil'></i>
                                     </a>
-                                    <form action="{{ route('tu.stok.destroy', $barang->id) }}" method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
+                                    <form action="{{ route('tu.stok.destroy', $barang->id) }}" 
+                                          method="POST" 
+                                          onsubmit="return confirm('Yakin ingin menghapus barang ini?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-action btn-delete" title="Hapus">

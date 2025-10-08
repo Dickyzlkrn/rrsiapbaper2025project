@@ -20,59 +20,83 @@ class StokBarangController extends Controller
     /**
      * Menampilkan daftar stok barang dengan fitur filter nama barang
      */
-   public function index(Request $request)
-{
-    $query = StokBarang::query();
+    public function index(Request $request)
+    {
+        $query = StokBarang::query();
 
-    if ($request->filled('nama_barang')) {
-        $query->where('nama_barang', 'LIKE', '%' . $request->nama_barang . '%');
-    }
+        if ($request->filled('nama_barang')) {
+            $query->where('nama_barang', 'LIKE', '%' . $request->nama_barang . '%');
+        }
 
-    $stokBarangs = $query->orderBy('nama_barang')->limit(1000)->get();
+        $stokBarangs = $query->orderBy('nama_barang')->get();
 
-    foreach ($stokBarangs as $barang) {
-        // Total terpakai sepanjang waktu (semua pengajuan disetujui)
-        $terpakaiTotal = PengajuanItem::where('nama_barang', $barang->nama_barang)
-            ->whereHas('pengajuan', function ($q) {
-                $q->where('status', 'disetujui');
-            })
-            ->sum('jumlah');
-
-        // Cek filter tanggal
+        // Jika user memilih rentang tanggal (biasanya per bulan)
         if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
             $tanggalAwal = Carbon::parse($request->tanggal_awal)->startOfDay();
             $tanggalAkhir = Carbon::parse($request->tanggal_akhir)->endOfDay();
 
-            // Hitung pemakaian dalam rentang filter
-            $terpakaiFilter = PengajuanItem::where('nama_barang', $barang->nama_barang)
-                ->whereHas('pengajuan', function ($q) use ($tanggalAwal, $tanggalAkhir) {
-                    $q->where('status', 'disetujui')
-                      ->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
-                })
-                ->sum('jumlah');
+            // Ambil bulan & tahun filter (berguna untuk stok awal)
+            $bulanFilter = $tanggalAwal->month;
+            $tahunFilter = $tanggalAwal->year;
 
-            $barang->terpakai = $terpakaiFilter;
+            foreach ($stokBarangs as $barang) {
+                // 1️⃣ Hitung total pemakaian SEBELUM bulan filter → untuk stok awal
+                $terpakaiSebelum = PengajuanItem::where('nama_barang', $barang->nama_barang)
+                    ->whereHas('pengajuan', function ($q) use ($tanggalAwal) {
+                        $q->where('status', 'disetujui')
+                            ->where('created_at', '<', $tanggalAwal);
+                    })
+                    ->sum('jumlah');
+
+                // 2️⃣ Jumlah masuk SEBELUM bulan filter (jika kamu simpan tanggal update stok)
+                $masukSebelum = $barang->where('id', $barang->id)
+                    ->where('created_at', '<', $tanggalAwal)
+                    ->sum('jumlah_masuk');
+
+                // 3️⃣ Hitung stok awal bulan ini = stok_awal + semua masuk sebelumnya - semua terpakai sebelumnya
+                $stokAwalBulanIni = ($barang->stok_awal + $masukSebelum) - $terpakaiSebelum;
+
+                // 4️⃣ Hitung jumlah masuk DALAM bulan yang difilter
+                $jumlahMasukBulanIni = $barang->where('id', $barang->id)
+                    ->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir])
+                    ->sum('jumlah_masuk');
+
+                // 5️⃣ Hitung pemakaian DALAM bulan yang difilter
+                $terpakaiBulanIni = PengajuanItem::where('nama_barang', $barang->nama_barang)
+                    ->whereHas('pengajuan', function ($q) use ($tanggalAwal, $tanggalAkhir) {
+                        $q->where('status', 'disetujui')
+                            ->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
+                    })
+                    ->sum('jumlah');
+
+                // 6️⃣ Hitung stok akhir bulan ini
+                $stokAkhirBulanIni = $stokAwalBulanIni + $jumlahMasukBulanIni - $terpakaiBulanIni;
+
+                // 7️⃣ Set properti ke objek untuk dikirim ke view
+                $barang->stok_awal_bulan = $stokAwalBulanIni;
+                $barang->jumlah_masuk_bulan = $jumlahMasukBulanIni;
+                $barang->terpakai = $terpakaiBulanIni;
+                $barang->stok_akhir_dinamis = $stokAkhirBulanIni;
+            }
         } else {
-            // Jika tidak filter tanggal, tampilkan pemakaian hanya hari ini saja
-            $hariIniAwal = Carbon::today()->startOfDay();
-            $hariIniAkhir = Carbon::today()->endOfDay();
+            // Jika tidak filter tanggal, tampilkan data default
+            foreach ($stokBarangs as $barang) {
+                $terpakaiTotal = PengajuanItem::where('nama_barang', $barang->nama_barang)
+                    ->whereHas('pengajuan', function ($q) {
+                        $q->where('status', 'disetujui');
+                    })
+                    ->sum('jumlah');
 
-            $terpakaiHariIni = PengajuanItem::where('nama_barang', $barang->nama_barang)
-                ->whereHas('pengajuan', function ($q) use ($hariIniAwal, $hariIniAkhir) {
-                    $q->where('status', 'disetujui')
-                      ->whereBetween('created_at', [$hariIniAwal, $hariIniAkhir]);
-                })
-                ->sum('jumlah');
-
-            $barang->terpakai = $terpakaiHariIni;
+                $barang->stok_awal_bulan = $barang->stok_awal;
+                $barang->jumlah_masuk_bulan = $barang->jumlah_masuk;
+                $barang->terpakai = $terpakaiTotal;
+                $barang->stok_akhir_dinamis = ($barang->stok_awal + $barang->jumlah_masuk) - $terpakaiTotal;
+            }
         }
 
-        // Hitung stok akhir berdasarkan total pemakaian sepanjang waktu
-        $barang->stok_akhir_dinamis = ($barang->stok_awal + $barang->jumlah_masuk) - $terpakaiTotal;
+        return view('pages.tu.stok.index', compact('stokBarangs'));
     }
 
-    return view('pages.tu.stok.index', compact('stokBarangs'));
-}
 
 
 
@@ -168,26 +192,26 @@ class StokBarangController extends Controller
      * Untuk fitur autocomplete nama barang (misalnya di form pengajuan)
      */
     public function autocomplete(Request $request)
-{
-    $term = $request->get('term');
+    {
+        $term = $request->get('term');
 
-    $stok = StokBarang::where('nama_barang', 'like', '%' . $term . '%')->get();
+        $stok = StokBarang::where('nama_barang', 'like', '%' . $term . '%')->get();
 
-    $result = $stok->map(function ($item) {
-        // Hitung stok akhir dinamis
-        $terpakai = $this->getTotalPemakaian($item->nama_barang);
-        $stokAkhir = ($item->stok_awal + $item->jumlah_masuk) - $terpakai;
+        $result = $stok->map(function ($item) {
+            // Hitung stok akhir dinamis
+            $terpakai = $this->getTotalPemakaian($item->nama_barang);
+            $stokAkhir = ($item->stok_awal + $item->jumlah_masuk) - $terpakai;
 
-        return [
-            'label' => $item->nama_barang,
-            'value' => $item->nama_barang,
-            'satuan' => $item->satuan ?? '-',
-            'stok_akhir' => $stokAkhir,
-        ];
-    });
+            return [
+                'label' => $item->nama_barang,
+                'value' => $item->nama_barang,
+                'satuan' => $item->satuan ?? '-',
+                'stok_akhir' => $stokAkhir,
+            ];
+        });
 
-    return response()->json($result);
-}
+        return response()->json($result);
+    }
 
 
     private function getTotalPemakaian($nama_barang)
