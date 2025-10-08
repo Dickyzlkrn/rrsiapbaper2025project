@@ -5,7 +5,6 @@ namespace App\Exports;
 use App\Models\StokBarang;
 use App\Models\PengajuanItem;
 use Illuminate\Support\Carbon;
-use Illuminate\Contracts\Support\Responsable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
@@ -20,59 +19,76 @@ class StokBarangExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $query = StokBarang::query();
-
-        // Filter nama barang
-        if ($this->request->filled('nama_barang')) {
-            $query->where('nama_barang', 'like', '%' . $this->request->nama_barang . '%');
-        }
-
-        // Filter berdasarkan tanggal
-        if ($this->request->filled('tanggal')) {
-            $query->whereDate('created_at', $this->request->tanggal);
-        }
-
-        // Filter bulan
-        if ($this->request->filled('bulan')) {
-            $query->whereMonth('created_at', $this->request->bulan);
-        }
-
-        // Filter tahun
-        if ($this->request->filled('tahun')) {
-            $query->whereYear('created_at', $this->request->tahun);
-        }
-
-        $tanggalAwal = $this->request->filled('tanggal_awal') ? Carbon::parse($this->request->tanggal_awal)->startOfDay() : null;
+        // Ambil filter dari request
+        $namaBarang   = $this->request->nama_barang;
+        $tanggalAwal  = $this->request->filled('tanggal_awal') ? Carbon::parse($this->request->tanggal_awal)->startOfDay() : null;
         $tanggalAkhir = $this->request->filled('tanggal_akhir') ? Carbon::parse($this->request->tanggal_akhir)->endOfDay() : null;
+        $bulan        = $this->request->bulan;
+        $tahun        = $this->request->tahun;
 
-        $data = $query->get()->map(function ($item) use ($tanggalAwal, $tanggalAkhir) {
-            // Query dasar
-            $terpakaiQuery = PengajuanItem::where('nama_barang', $item->nama_barang)
-                ->whereHas('pengajuan', function ($q) {
-                    $q->where('status', 'disetujui');
-                });
+        // Ambil semua data stok
+        $stokData = StokBarang::query()
+            ->when($namaBarang, fn($q) => $q->where('nama_barang', 'like', "%{$namaBarang}%"))
+            ->when($bulan, fn($q) => $q->whereMonth('created_at', $bulan))
+            ->when($tahun, fn($q) => $q->whereYear('created_at', $tahun))
+            ->get()
+            ->map(function ($item) use ($tanggalAwal, $tanggalAkhir) {
 
-            // Filter tanggal pemakaian jika tersedia
-            if ($tanggalAwal && $tanggalAkhir) {
-                $terpakaiQuery->whereHas('pengajuan', function ($q) use ($tanggalAwal, $tanggalAkhir) {
-                    $q->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
-                });
-            }
+                // =========== Hitung Terpakai ===========
+                $terpakaiQuery = PengajuanItem::where('nama_barang', $item->nama_barang)
+                    ->whereHas('pengajuan', function ($q) {
+                        $q->where('status', 'disetujui');
+                    });
 
-            $terpakai = $terpakaiQuery->sum('jumlah');
-            $stokAkhir = ($item->stok_awal + $item->jumlah_masuk) - $terpakai;
+                if ($tanggalAwal && $tanggalAkhir) {
+                    $terpakaiQuery->whereHas('pengajuan', function ($q) use ($tanggalAwal, $tanggalAkhir) {
+                        $q->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
+                    });
+                }
 
-            return [
-                'Nama Barang'   => $item->nama_barang,
-                'Satuan'        => $item->satuan ?? '-',
-                'Stok Awal'     => $item->stok_awal,
-                'Jumlah Masuk'  => $item->jumlah_masuk,
-                'Terpakai'      => $terpakai,
-                'Stok Akhir'    => $stokAkhir,
-            ];
-        });
+                $terpakai = $terpakaiQuery->sum('jumlah');
 
-        return $data;
+                // =========== Hitung Jumlah Masuk ===========
+                $jumlahMasuk = StokBarang::where('nama_barang', $item->nama_barang)
+                    ->when($tanggalAwal && $tanggalAkhir, function ($q) use ($tanggalAwal, $tanggalAkhir) {
+                        $q->whereBetween('created_at', [$tanggalAwal, $tanggalAkhir]);
+                    })
+                    ->sum('jumlah_masuk');
+
+                // =========== Hitung Stok Awal Dinamis ===========
+                $stokMasukSebelumnya = StokBarang::where('nama_barang', $item->nama_barang)
+                    ->where('created_at', '<', $tanggalAwal ?? now())
+                    ->sum('jumlah_masuk');
+
+                $stokKeluarSebelumnya = PengajuanItem::where('nama_barang', $item->nama_barang)
+                    ->whereHas('pengajuan', function ($q) {
+                        $q->where('status', 'disetujui');
+                    })
+                    ->when($tanggalAwal, function ($q) use ($tanggalAwal) {
+                        $q->whereHas('pengajuan', function ($sub) use ($tanggalAwal) {
+                            $sub->where('created_at', '<', $tanggalAwal);
+                        });
+                    })
+                    ->sum('jumlah');
+
+                $stokAwalDinamis = ($item->stok_awal + $stokMasukSebelumnya) - $stokKeluarSebelumnya;
+
+                // =========== Hitung Stok Akhir ===========
+                $stokAkhir = ($stokAwalDinamis + $jumlahMasuk) - $terpakai;
+
+                // =========== Return Data ===========
+                return [
+                    'Nama Barang'   => $item->nama_barang,
+                    'Satuan'        => $item->satuan ?? '-',
+                    'Tanggal Masuk Barang Awal' => Carbon::parse($item->created_at)->format('d-m-Y H:i'),
+                    'Stok Awal'     => $stokAwalDinamis,
+                    'Jumlah Masuk'  => $jumlahMasuk,
+                    'Terpakai'      => $terpakai,
+                    'Stok Akhir'    => $stokAkhir,
+                ];
+            });
+
+        return $stokData;
     }
 
     public function headings(): array
@@ -80,6 +96,7 @@ class StokBarangExport implements FromCollection, WithHeadings
         return [
             'Nama Barang',
             'Satuan',
+            'Tanggal Masuk Barang Awal',
             'Stok Awal',
             'Jumlah Masuk',
             'Terpakai',
